@@ -9,7 +9,6 @@ use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Optional;
 
 class TaskController extends Controller
 {
@@ -48,7 +47,9 @@ class TaskController extends Controller
         });
 
         // Eager load categories for the response
-        return new TaskResource(Optional::wrap($task)->load('categories'));
+        if ($task !== null) {
+            return new TaskResource($task->load('categories'));
+        }
     }
 
     /**
