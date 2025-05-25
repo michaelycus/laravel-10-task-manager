@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\TaskViewController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,36 +15,25 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin'       => Route::has('login'),
-        'canRegister'    => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion'     => PHP_VERSION,
-    ]);
+    return redirect('/tasks-board');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-});
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::middleware([
+//     'auth:sanctum',
+//     config('jetstream.auth_session'),
+//     'verified',
+// ])->group(function () {
+//     Route::get('/dashboard', function () {
+//         return Inertia::render('Dashboard');
+//     })->name('dashboard');
+// });
 
 // Task Board Route
 Route::get('/tasks-board', [TaskViewController::class, 'board'])
-    ->middleware(['auth', 'verified'])
     ->name('tasks.board');
 
 // Example for a regular task list (if you build one later for comparison)
 Route::get('/tasks-list', [TaskViewController::class, 'index'])
-    ->middleware(['auth', 'verified'])
     ->name('tasks-list.index');
 
 // Route::middleware('auth')->group(function () {
