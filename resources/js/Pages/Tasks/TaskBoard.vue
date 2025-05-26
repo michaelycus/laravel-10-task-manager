@@ -101,11 +101,11 @@ const laneTasks = computed(() => {
             </div>
           </div>
         </div>
-        <div class="mt-8 text-center">
+        <!-- <div class="mt-8 text-center">
           <Link :href="route('tasks-list.index')" class="text-indigo-600 hover:text-indigo-800">
             Go to Task List View
           </Link>
-        </div>
+        </div> -->
       </div>
     </div>
   </AuthenticatedLayout>

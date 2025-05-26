@@ -16,10 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 // Versioning the API
 Route::prefix('v1')->group(function () {
     Route::apiResource('tasks', TaskController::class);
@@ -28,8 +24,4 @@ Route::prefix('v1')->group(function () {
     // Nested resource: Tasks for a specific category
     // GET /api/v1/categories/{category}/tasks
     Route::get('categories/{category}/tasks', [CategoryTaskController::class, 'index'])->name('categories.tasks.index');
-
-    // If there is a need to add a task to a category directly via a nested route (alternative to category_ids in Task store/update)
-    // POST /api/v1/categories/{category}/tasks
-    // Route::post('categories/{category}/tasks', [CategoryTaskController::class, 'store'])->name('categories.tasks.store');
 });
