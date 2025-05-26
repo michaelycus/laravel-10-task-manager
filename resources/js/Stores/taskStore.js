@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { usePage } from '@inertiajs/vue3'; // To get initial props if needed
 
 // Simple debounce function
@@ -107,6 +107,53 @@ export const useTaskStore = defineStore('tasks', () => {
     }
   }
 
+  // --- Real-time Event Handling ---
+  function handleTaskCreated(eventData) {
+    console.log('Event: task.created', eventData);
+    const newTask = eventData.task;
+    // Avoid duplicates if the current user created it (API might have already added it)
+    if (!tasks.value.find(t => t.id === newTask.id)) {
+      tasks.value.unshift(newTask); // Add to the beginning or sort as needed
+    }
+  }
+
+  function handleTaskUpdated(eventData) {
+    console.log('Event: task.updated', eventData);
+    const updatedTask = eventData.task;
+    const index = tasks.value.findIndex(t => t.id === updatedTask.id);
+    if (index !== -1) {
+      tasks.value[index] = { ...tasks.value[index], ...updatedTask };
+    } else {
+      // If task wasn't in the list, maybe add it (depends on app logic)
+      tasks.value.unshift(updatedTask);
+    }
+  }
+
+  function handleTaskDeleted(eventData) {
+    console.log('Event: task.deleted', eventData);
+    const { taskId } = eventData;
+    tasks.value = tasks.value.filter(t => t.id !== taskId);
+  }
+
+  function listenForTaskEvents() {
+    if (window.Echo) {
+      window.Echo.channel('tasks') // Public channel named 'tasks'
+        .listen('.task.created', handleTaskCreated) // Note the dot prefix for broadcastAs
+        .listen('.task.updated', handleTaskUpdated)
+        .listen('.task.deleted', handleTaskDeleted);
+      console.log("Subscribed to 'tasks' channel for real-time updates.");
+    } else {
+      console.warn('Laravel Echo not available. Real-time updates disabled.');
+    }
+  }
+
+  function stopListeningForTaskEvents() {
+    if (window.Echo) {
+      window.Echo.leaveChannel('tasks');
+      console.log("Left 'tasks' channel.");
+    }
+  }
+
   return {
     tasks,
     isLoading,
@@ -116,5 +163,8 @@ export const useTaskStore = defineStore('tasks', () => {
     fetchTasks,
     updateTaskStatus,
     setTasks,
+    // Expose listener functions to be called from components
+    listenForTaskEvents,
+    stopListeningForTaskEvents,
   };
 });

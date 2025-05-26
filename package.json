@@ -20,7 +20,9 @@
         "vue": "^3.2.31"
     },
     "dependencies": {
+        "laravel-echo": "^2.1.4",
         "pinia": "^3.0.2",
+        "pusher-js": "^8.4.0",
         "vuedraggable": "^4.1.0"
     }
 }

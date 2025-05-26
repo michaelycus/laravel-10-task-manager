@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import draggable from 'vuedraggable';
 import { useTaskStore } from '@/Stores/taskStore';
@@ -15,12 +15,17 @@ const props = defineProps({
 
 const taskStore = useTaskStore();
 
-onMounted(() => {
+onMounted(async () => {
   if (props.initialTasks && props.initialTasks.length > 0) {
     taskStore.setTasks(props.initialTasks);
   } else {
-    taskStore.fetchTasks();
+    await taskStore.fetchTasks(); // Ensure tasks are fetched before listening
   }
+  taskStore.listenForTaskEvents(); // Start listening when component mounts
+});
+
+onUnmounted(() => {
+  taskStore.stopListeningForTaskEvents(); // Stop listening when component unmounts
 });
 
 const handleTaskMoved = (event, targetLaneId) => {
